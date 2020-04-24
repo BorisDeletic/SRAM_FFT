@@ -21,6 +21,10 @@
 
 #ifndef arduinoFFT_h /* Prevent loading library twice */
 #define arduinoFFT_h
+
+#include <virtmem.h>
+#include <alloc/spiram_alloc.h>
+
 #ifdef ARDUINO
 	#if ARDUINO >= 100
 		#include "Arduino.h"
@@ -61,7 +65,7 @@
 #define sixPi 18.84955593
 
 #ifdef __AVR__
-	static const double _c1[]PROGMEM = {0.0000000000, 0.7071067812, 0.9238795325, 0.9807852804,
+static const double _c1[]PROGMEM = {0.0000000000, 0.7071067812, 0.9238795325, 0.9807852804,
 																0.9951847267, 0.9987954562, 0.9996988187, 0.9999247018,
 																0.9999811753, 0.9999952938, 0.9999988235, 0.9999997059,
 																0.9999999265, 0.9999999816, 0.9999999954, 0.9999999989,
@@ -72,6 +76,10 @@
 																0.0003834952, 0.0001917476, 0.0000958738, 0.0000479369,
 																0.0000239684};
 #endif
+
+using namespace virtmem;
+
+
 class arduinoFFT {
 public:
 	/* Constructor */
@@ -84,18 +92,32 @@ public:
 	uint8_t Exponent(uint16_t value);
 
 	void ComplexToMagnitude(double *vReal, double *vImag, uint16_t samples);
+    void ComplexToMagnitude(VPtr<double, SPIRAMVAlloc> &vReal, VPtr<double, SPIRAMVAlloc> &vImag, uint16_t samples);
+
 	void Compute(double *vReal, double *vImag, uint16_t samples, uint8_t dir);
 	void Compute(double *vReal, double *vImag, uint16_t samples, uint8_t power, uint8_t dir);
+    void Compute(VPtr<double, SPIRAMVAlloc> &vReal, VPtr<double, SPIRAMVAlloc> &vImag, uint16_t samples, uint8_t dir);
+    void Compute(VPtr<double, SPIRAMVAlloc> &vReal, VPtr<double, SPIRAMVAlloc> &vImag, uint16_t samples, uint8_t power, uint8_t dir);
+
 	void DCRemoval(double *vData, uint16_t samples);
+
+    void DCRemoval(VPtr<double, SPIRAMVAlloc> &vData, uint16_t samples);
+
 	double MajorPeak(double *vD, uint16_t samples, double samplingFrequency);
+    double MajorPeak(VPtr<double, SPIRAMVAlloc> &vD, uint16_t samples, double samplingFrequency);
 	void MajorPeak(double *vD, uint16_t samples, double samplingFrequency, double *f, double *v);
+    void MajorPeak(VPtr<double, SPIRAMVAlloc> &vD, uint16_t samples, double samplingFrequency, VPtr<double, SPIRAMVAlloc> &f, VPtr<double, SPIRAMVAlloc> &v);
+
 	void Windowing(double *vData, uint16_t samples, uint8_t windowType, uint8_t dir);
+    void Windowing(VPtr<double, SPIRAMVAlloc> &vData, uint16_t samples, uint8_t windowType, uint8_t dir);
 
 	void ComplexToMagnitude();
 	void Compute(uint8_t dir);
 	void DCRemoval();
 	double MajorPeak();
 	void MajorPeak(double *f, double *v);
+    void MajorPeak(VPtr<double, SPIRAMVAlloc> &f, VPtr<double, SPIRAMVAlloc> &v);
+
 	void Windowing(uint8_t windowType, uint8_t dir);
 
 private:
@@ -106,7 +128,8 @@ private:
 	double *_vImag;
 	uint8_t _power;
 	/* Functions */
-	void Swap(double *x, double *y);
+    void Swap(VPtr<double, SPIRAMVAlloc> &x, uint16_t i, uint16_t j);
+    void Swap(double *x, double *y);
 };
 
 #endif

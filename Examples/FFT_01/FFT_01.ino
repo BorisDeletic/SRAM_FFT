@@ -28,7 +28,7 @@
   present in the signal.
 */
 
-#include "arduinoFFT.h"
+#include "SRAM_FFT.h"
 
 arduinoFFT FFT = arduinoFFT(); /* Create FFT object */
 /*
