@@ -50,7 +50,7 @@ arduinoFFT FFT = arduinoFFT(); /* Create FFT object */
 /*
 These values can be changed in order to evaluate the functions
 */
-const uint16_t samples = 4096; //This value MUST ALWAYS be a power of 2
+const uint16_t samples = 2048; //This value MUST ALWAYS be a power of 2
 const double signalFrequency = 1000;
 const double samplingFrequency = 5000;
 const uint8_t amplitude = 100;
@@ -111,18 +111,22 @@ void loop()
     /* Print the results of the simulated sampling according to time */
     Serial.println("Data:");
     PrintVector(vpReal, samples, SCL_TIME);
+    unsigned long now = millis();
     FFT.Windowing(vpReal, samples, FFT_WIN_TYP_HAMMING, FFT_FORWARD);	/* Weigh data */
-    Serial.println("Weighed data:");
+    Serial.print("Weighed data time: "); Serial.println(millis() - now);
+    now = millis();
     PrintVector(vpReal, samples, SCL_TIME);
     FFT.Compute(vpReal, vpImag, samples, FFT_FORWARD); /* Compute FFT */
-    Serial.println("Computed Real values:");
+    Serial.print("Computed Real values: "); Serial.println(millis() - now);
     PrintVector(vpReal, samples, SCL_INDEX);
     Serial.println("Computed Imaginary values:");
     PrintVector(vpImag, samples, SCL_INDEX);
+    now = millis();
     FFT.ComplexToMagnitude(vpReal, vpImag, samples); /* Compute magnitudes */
-    Serial.println("Computed magnitudes:");
+    Serial.print("Computed magnitudes:"); Serial.println(millis() - now);
     PrintVector(vpReal, (samples >> 1), SCL_FREQUENCY);
     double x = FFT.MajorPeak(vpReal, samples, samplingFrequency);
+    Serial.print("Major peak: "); Serial.println(millis() - now);
     Serial.println(x, 6);
 
 

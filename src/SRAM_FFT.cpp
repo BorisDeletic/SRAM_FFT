@@ -202,6 +202,8 @@ void arduinoFFT::Compute(VPtr<double, SPIRAMVAlloc> &vReal, VPtr<double, SPIRAMV
         j += k;
     }
     // Compute the FFT
+    bool test = true;
+    uint8_t index = 0;
 
     double c1 = -1.0;
     double c2 = 0.0;
@@ -226,8 +228,14 @@ void arduinoFFT::Compute(VPtr<double, SPIRAMVAlloc> &vReal, VPtr<double, SPIRAMV
             u1 = z;
         }
 
+    if (test) {
+        c2 = pgm_read_float_near(&(_c2[index]));
+        c1 = pgm_read_float_near(&(_c1[index]));
+        index++;
+    } else {
         c2 = sqrt((1.0 - c1) / 2.0);
         c1 = sqrt((1.0 + c1) / 2.0);
+    }
 
         if (dir == FFT_FORWARD) {
             c2 = -c2;
